@@ -43,6 +43,33 @@ public class PreviewPreferences {
         this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);
     }
 
+    /// Creates Object with default values
+    private  PreviewPreferences() {
+        this(
+                List.of(),                     // Default layout cycle
+                0,                             // Default layout cycle position
+                new TextBasedPreviewLayout("", ""), // Default custom preview layout
+                "",                            // Default custom preview layout string
+                false,                          // Show preview as extra tab
+                false,                          // Show preview entry table tooltip
+                List.of()                      // Default bst preview layout paths
+        );
+    }
+
+    public static PreviewPreferences getDefault() {
+        return new PreviewPreferences();
+    }
+
+    public void setAll(PreviewPreferences preferences) {
+        this.layoutCycle.setAll(preferences.getLayoutCycle());
+        this.layoutCyclePosition.set(preferences.getLayoutCyclePosition());
+        this.customPreviewLayout.set(preferences.getCustomPreviewLayout());
+        this.defaultCustomPreviewLayout.set(preferences.getDefaultCustomPreviewLayout());
+        this.showPreviewAsExtraTab.set(preferences.shouldShowPreviewAsExtraTab());
+        this.showPreviewEntryTableTooltip.set(preferences.shouldShowPreviewEntryTableTooltip());
+        this.bstPreviewLayoutPaths.setAll(preferences.getBstPreviewLayoutPaths());
+    }
+
     public ObservableList<PreviewLayout> getLayoutCycle() {
         return layoutCycle;
     }

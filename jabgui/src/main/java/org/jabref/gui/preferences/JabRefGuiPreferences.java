@@ -316,9 +316,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // region PreviewStyle
         defaults.put(CYCLE_PREVIEW, "Preview;" + CSLStyleLoader.DEFAULT_STYLE);
-        defaults.put(CYCLE_PREVIEW_POS, 0);
-        defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
-        defaults.put(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, Boolean.FALSE);
         defaults.put(PREVIEW_STYLE,
                 "<font face=\"sans-serif\">" +
                         "<b>\\bibtextype</b><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>\\end{citationkey}__NEWLINE__" +
@@ -410,6 +407,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(WorkspacePreferences.getDefault());
         getGuiPreferences().setAll(CoreGuiPreferences.getDefault());
         getDonationPreferences().setAll(DonationPreferences.getDefault());
+        getPreviewPreferences().setAll(PreviewPreferences.getDefault());
     }
 
     @Override
@@ -420,6 +418,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         getWorkspacePreferences().setAll(getWorkspacePreferencesFromBackingStore(getWorkspacePreferences()));
         getGuiPreferences().setAll(getCoreGuiPreferencesFromBackingStore(getGuiPreferences()));
         getDonationPreferences().setAll(getDonationPreferencesFromBackingStore(getDonationPreferences()));
+        getPreviewPreferences().setAll(PreviewPreferences.getDefault());
     }
 
     // region EntryEditorPreferences
@@ -859,23 +858,22 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return previewPreferences;
         }
 
-        String style = get(PREVIEW_STYLE);
-        List<PreviewLayout> layouts = getPreviewLayouts(style);
+        this.previewPreferences = getPreviewPreferencesFronBackingStore(PreviewPreferences.getDefault());
 
-        this.previewPreferences = new PreviewPreferences(
-                layouts,
-                getPreviewCyclePosition(layouts),
-                new TextBasedPreviewLayout(
-                        style,
-                        getLayoutFormatterPreferences(),
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
-                (String) defaults.get(PREVIEW_STYLE),
-                getBoolean(PREVIEW_AS_TAB),
-                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP),
-                getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
-                                                       .map(Path::of)
-                                                       .collect(Collectors.toList())
-        );
+//        this.previewPreferences = new PreviewPreferences(
+//                layouts,
+//                getPreviewCyclePosition(layouts),
+//                new TextBasedPreviewLayout(
+//                        style,
+//                        getLayoutFormatterPreferences(),
+//                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
+//                (String) defaults.get(PREVIEW_STYLE),
+//                getBoolean(PREVIEW_AS_TAB),
+//                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP),
+//                getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
+//                                                       .map(Path::of)
+//                                                       .collect(Collectors.toList())
+//        );
 
         previewPreferences.getLayoutCycle().addListener((InvalidationListener) c -> storePreviewLayouts(previewPreferences.getLayoutCycle()));
         EasyBind.listen(previewPreferences.layoutCyclePositionProperty(), (obs, oldValue, newValue) -> putInt(CYCLE_PREVIEW_POS, newValue));
@@ -884,6 +882,26 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(previewPreferences.showPreviewEntryTableTooltip(), (obs, oldValue, newValue) -> putBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, newValue));
         previewPreferences.getBstPreviewLayoutPaths().addListener((InvalidationListener) c -> storeBstPaths(previewPreferences.getBstPreviewLayoutPaths()));
         return this.previewPreferences;
+    }
+
+    private PreviewPreferences getPreviewPreferencesFronBackingStore(PreviewPreferences defaults) {
+        String style = get(PREVIEW_STYLE, defaults.getCustomPreviewLayout().getText());
+        List<PreviewLayout> layouts = getPreviewLayouts(style);
+
+        return new PreviewPreferences(
+                layouts,
+                getPreviewCyclePosition(layouts),
+                new TextBasedPreviewLayout(
+                        style,
+                        getLayoutFormatterPreferences(),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
+                defaults.getDefaultPreviewLayout().getText(),
+                getBoolean(PREVIEW_AS_TAB, defaults.showPreviewAsExtraTab()),
+                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaults.showPreviewEntryTableTooltip()),
+                getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
+                                                       .map(Path::of)
+                                                       .collect(Collectors.toList())
+        );
     }
 
     private void storeBstPaths(List<Path> bstPaths) {
