@@ -14,6 +14,14 @@ public class DOIPreferences {
         this.defaultBaseURI = new SimpleStringProperty(defaultBaseURI);
     }
 
+    private DOIPreferences() {
+        this(false, "");
+    }
+
+    public static DOIPreferences getDefault() {
+        return new DOIPreferences();
+    }
+
     public boolean isUseCustom() {
         return useCustom.get();
     }

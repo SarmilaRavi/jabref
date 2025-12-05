@@ -15,6 +15,14 @@ public class NameFormatterPreferences {
         this.nameFormatterValue = FXCollections.observableArrayList(nameFormatterValue);
     }
 
+    private NameFormatterPreferences() {
+        this(List.of(), List.of());
+    }
+
+    public static NameFormatterPreferences getDefault() {
+        return new NameFormatterPreferences();
+    }
+
     public ObservableList<String> getNameFormatterKey() {
         return nameFormatterKey;
     }

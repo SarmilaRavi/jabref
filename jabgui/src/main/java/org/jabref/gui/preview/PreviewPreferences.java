@@ -14,6 +14,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
 
@@ -44,11 +46,14 @@ public class PreviewPreferences {
     }
 
     /// Creates Object with default values
-    private  PreviewPreferences() {
+    private PreviewPreferences() {
         this(
                 List.of(),                     // Default layout cycle
                 0,                             // Default layout cycle position
-                new TextBasedPreviewLayout("", ""), // Default custom preview layout
+                new TextBasedPreviewLayout(
+                        TextBasedPreviewLayout.NAME,
+                        LayoutFormatterPreferences.getDefault(),
+                        new JournalAbbreviationRepository()), // Default custom preview layout
                 "",                            // Default custom preview layout string
                 false,                          // Show preview as extra tab
                 false,                          // Show preview entry table tooltip

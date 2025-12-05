@@ -860,21 +860,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         this.previewPreferences = getPreviewPreferencesFronBackingStore(PreviewPreferences.getDefault());
 
-//        this.previewPreferences = new PreviewPreferences(
-//                layouts,
-//                getPreviewCyclePosition(layouts),
-//                new TextBasedPreviewLayout(
-//                        style,
-//                        getLayoutFormatterPreferences(),
-//                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
-//                (String) defaults.get(PREVIEW_STYLE),
-//                getBoolean(PREVIEW_AS_TAB),
-//                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP),
-//                getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
-//                                                       .map(Path::of)
-//                                                       .collect(Collectors.toList())
-//        );
-
         previewPreferences.getLayoutCycle().addListener((InvalidationListener) c -> storePreviewLayouts(previewPreferences.getLayoutCycle()));
         EasyBind.listen(previewPreferences.layoutCyclePositionProperty(), (obs, oldValue, newValue) -> putInt(CYCLE_PREVIEW_POS, newValue));
         EasyBind.listen(previewPreferences.customPreviewLayoutProperty(), (obs, oldValue, newValue) -> put(PREVIEW_STYLE, newValue.getText()));
@@ -885,7 +870,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     private PreviewPreferences getPreviewPreferencesFronBackingStore(PreviewPreferences defaults) {
-        String style = get(PREVIEW_STYLE, defaults.getCustomPreviewLayout().getText());
+        String style = get(PREVIEW_STYLE, TextBasedPreviewLayout.NAME);
         List<PreviewLayout> layouts = getPreviewLayouts(style);
 
         return new PreviewPreferences(
@@ -895,9 +880,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                         style,
                         getLayoutFormatterPreferences(),
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
-                defaults.getDefaultPreviewLayout().getText(),
-                getBoolean(PREVIEW_AS_TAB, defaults.showPreviewAsExtraTab()),
-                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaults.showPreviewEntryTableTooltip()),
+                defaults.getDefaultCustomPreviewLayout(),
+                getBoolean(PREVIEW_AS_TAB, defaults.shouldShowPreviewAsExtraTab()),
+                getBoolean(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, defaults.shouldShowPreviewEntryTableTooltip()),
                 getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()
                                                        .map(Path::of)
                                                        .collect(Collectors.toList())

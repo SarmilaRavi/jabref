@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.logic.layout.format.NameFormatterPreferences;
@@ -23,6 +24,17 @@ public class LayoutFormatterPreferences {
         this.nameFormatterPreferences = nameFormatterPreferences;
         this.mainFileDirectoryProperty = mainFileDirectoryProperty;
         this.doiPreferences = doiPreferences;
+    }
+
+    private LayoutFormatterPreferences() {
+        this(NameFormatterPreferences.getDefault(),
+                DOIPreferences.getDefault(),
+                new SimpleStringProperty("")
+        );
+    }
+
+    public static LayoutFormatterPreferences getDefault() {
+        return new LayoutFormatterPreferences();
     }
 
     public NameFormatterPreferences getNameFormatterPreferences() {
